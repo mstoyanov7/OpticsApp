@@ -12,6 +12,8 @@ public:
     std::string getName() const { return m_Name; }
     std::string getLocation() const { return m_Location; }
     std::string getPhone() const { return m_Phone; }
+    
+    std::vector<OpticMaterial> getMaterials() const {return m_Materials; }
 
     void setBulstat(const std::string& bulstat) {m_Bulstat = bulstat;}
     void setName(const std::string& name) {m_Name = name;}

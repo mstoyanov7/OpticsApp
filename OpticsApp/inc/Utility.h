@@ -2,6 +2,7 @@
 #include <fstream> 
 #include <string>
 #include <vector>
+#include <sstream>
 
 enum MENU_TYPE
 {   
@@ -40,6 +41,8 @@ static const char PRODUCT_CHOICE[] = "\nDo you want to add products for this sup
                                     "1. Yes\n"
                                     "2. No\n"
                                     "Enter your choice: ";
+
+static const char DATABASE[] = "../data/data.txt";
 
 class Utility
 {
@@ -83,7 +86,13 @@ class Utility
 
             return addProductChoice == 1;
         }
-        
+
+        static void trimWhitespaces(std::string& s)
+        {
+            while (!s.empty() && std::isspace(s.back())) s.pop_back();
+            while (!s.empty() && std::isspace(s.front())) s.erase(0, 1);
+        };
+
     private:
         Utility() = default;
         Utility(const Utility&) = delete;

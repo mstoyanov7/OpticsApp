@@ -16,6 +16,9 @@ class SupplierManagement
 
         Supplier* selectSupplier(const int& index);
         
+        void loadDatabase();
+        void saveDatabase();
+
         void showShoppingMenu();
         void showManagerMenu();
         
