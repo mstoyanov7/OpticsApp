@@ -2,6 +2,8 @@
 
 void SupplierManagement::Run()
 {   
+    loadDatabase();
+
     int menuSelection; 
     do {
         menuSelection = Utility::MainMenuGetChoice();
@@ -10,7 +12,7 @@ void SupplierManagement::Run()
         {   
             case SHOPPING_MENU: showShoppingMenu(); break;
             case MANAGER_MENU: showManagerMenu(); break;
-            case EXIT: std::cout << "Exiting the application." << std::endl; break;
+            case EXIT: saveDatabase(); break;
             default: std::cout << "Invalid choice. Please try again." << std::endl; break;
         }
     } while (menuSelection != EXIT);
@@ -69,6 +71,117 @@ void SupplierManagement::modifySupplier(const int& index)
         getline(std::cin, phone);
         if (!phone.empty()) m_Suppliers[index].setPhone(phone);
     }
+}
+
+void SupplierManagement::loadDatabase()
+{
+    std::ifstream infile(DATABASE);
+
+    if (!infile.is_open())
+    {
+       std::cerr << "Failed to open the file or file was not found!" << std::endl;
+       return;
+    }
+
+    std::string line;
+    bool needToProcessLine = false;
+
+    while (needToProcessLine || std::getline(infile, line))
+    {
+        if (!needToProcessLine)
+        {
+            Utility::trimWhitespaces(line);
+        }
+
+        needToProcessLine = false;
+
+        if (line.empty()) continue;
+
+        if (line.substr(0, 10) == "[Supplier]")
+        {
+            std::string supplierInfo = line.substr(10);
+            Utility::trimWhitespaces(supplierInfo);
+
+            std::stringstream ss(supplierInfo);
+            std::string bulstat, name, location, phone;
+
+            std::getline(ss, bulstat, ',');
+            std::getline(ss, name, ',');
+            std::getline(ss, location, ',');
+            std::getline(ss, phone, ',');
+
+            Utility::trimWhitespaces(bulstat);
+            Utility::trimWhitespaces(name);
+            Utility::trimWhitespaces(location);
+            Utility::trimWhitespaces(phone);
+
+            Supplier supplier(bulstat, name, location, phone);
+
+            while (std::getline(infile, line))
+            {
+                Utility::trimWhitespaces(line);
+                if (line.substr(0, 9) == "[Product]")
+                {
+                    std::string productInfo = line.substr(9);
+                    Utility::trimWhitespaces(productInfo);
+
+                    std::stringstream ssProduct(productInfo);
+                    std::string type, thicknessStr, diopterStr, material, priceStr;
+
+                    std::getline(ssProduct, type, ',');
+                    std::getline(ssProduct, thicknessStr, ',');
+                    std::getline(ssProduct, diopterStr, ',');
+                    std::getline(ssProduct, material, ',');
+                    std::getline(ssProduct, priceStr, ',');
+
+                    Utility::trimWhitespaces(type);
+                    Utility::trimWhitespaces(thicknessStr);
+                    Utility::trimWhitespaces(diopterStr);
+                    Utility::trimWhitespaces(material);
+                    Utility::trimWhitespaces(priceStr);
+
+                    float thickness = std::stof(thicknessStr);
+                    float diopter = std::stof(diopterStr);
+                    float price = std::stof(priceStr);
+
+                    OpticMaterial product(type, thickness, diopter, material, price);
+                    supplier.addMaterial(product);
+                }
+                else if (line.substr(0, 10) == "[Supplier]")
+                {
+                    needToProcessLine = true;
+                    break;
+                }
+            }
+            m_Suppliers.push_back(supplier);
+        }
+    }
+}
+
+void SupplierManagement::saveDatabase()
+{
+    std::ofstream outfile(DATABASE);
+    if (!outfile.is_open())
+    {
+        std::cerr << "Failed to open the file for writing." << std::endl;
+        return;
+    }
+
+    for (const auto& supplier : m_Suppliers)
+    {
+        outfile << "[Supplier] " << supplier.getBulstat() << ", " << supplier.getName() << ", "
+                << supplier.getLocation() << ", " << supplier.getPhone() << "\n";
+
+        for (const auto& product : supplier.getMaterials())
+        {
+            outfile << "[Product] " << product.getType() << ", " << product.getThickness() << ", "
+                    << product.getDiopter() << ", " << product.getMaterial() << ", " << product.getPrice() << "\n";
+        }
+        
+        outfile << "\n"; // Add an empty line between suppliers
+    }
+
+    outfile.close();
 }
 
 void SupplierManagement::showShoppingMenu()
