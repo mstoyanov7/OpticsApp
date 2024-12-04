@@ -17,6 +17,7 @@ REM Initialize SRC_FILES variable to hold all source file paths
 set "SRC_FILES="
 
 REM Find all .cpp files in the project directory and append them to SRC_FILES
+REM Print each file being compiled
 for /r "%PROJECT_DIR%" %%i in (*.cpp) do (
     set "SRC_FILES=!SRC_FILES! "%%i""
 )
@@ -26,7 +27,10 @@ set "OUTPUT_BINARY=optics_app.exe"
 
 REM Compile the source files, including the directory for header files
 echo Compiling the project...
-g++ -o "%OUTPUT_BINARY%" %SRC_FILES% -Wall -Wextra -O2 -I"%PROJECT_DIR%\inc"
+for %%i in (%SRC_FILES%) do (
+    echo Compiling: %%~nxi
+)
+g++ -o "%OUTPUT_BINARY%" %SRC_FILES%  -O2 -I"%PROJECT_DIR%\inc" -w
 
 REM Check if compilation was successful
 if %ERRORLEVEL% equ 0 (

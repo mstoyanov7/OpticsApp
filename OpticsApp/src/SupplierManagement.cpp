@@ -1,10 +1,10 @@
-#include "SupplierManagement.h"
+#include "SupplierManagement.hpp"
 
 void SupplierManagement::Run()
 {   
     loadDatabase();
 
-    int menuSelection; 
+    int menuSelection;
     do {
         menuSelection = Utility::MainMenuGetChoice();
         
@@ -14,7 +14,7 @@ void SupplierManagement::Run()
             case MANAGER_MENU: showManagerMenu(); break;
             case EXIT: saveDatabase(); break;
             default: std::cout << "Invalid choice. Please try again." << std::endl; break;
-        }
+        }  
     } while (menuSelection != EXIT);
 }
 
